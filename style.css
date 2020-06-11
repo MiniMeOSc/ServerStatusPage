@@ -1,0 +1,129 @@
+.jumbotron {
+  text-align: center;
+}
+
+.mastfoot {
+  color: #999; /* IE8 proofing */
+  color: rgba(255,255,255,.5);
+  text-align: center;
+  margin: 30px auto;
+}
+
+.mastfoot a {
+  color: #444;
+}
+
+.box {
+  padding: 5px 20px;
+  border-radius: 10px; 
+  background-color: rgba(64, 64, 64, 0.75);
+  box-shadow: 0px 0px 15px rgb(0, 0, 0);
+  text-shadow: 0 1px 3px rgba(58, 41, 41, 0.5);
+  color: #fff;
+  transition: background-color 1s;
+  margin: 10px 0;
+}
+
+.box.online {
+	background-color: rgba(33, 128, 19, 0.75);
+}
+
+.game {
+  min-height: 150px;
+}
+
+.h3, h3 {
+  font-size: 22px
+}
+
+.address {
+  line-height: 34px;
+}
+
+.address > * {
+  vertical-align: middle;
+}
+
+.playerlist {
+  height: 80px;
+  overflow-y: auto;
+  background-color: rgba(255, 255, 255, 0.25);
+  border-color: rgba(230, 230, 230, 0.25);
+  columns: 3;
+  padding: 5px 20px;
+}
+.name {
+  display: inline-block;
+  max-width: calc(100% - 78px); /* 78px is the size of the Offline/Online label */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
+.backgroundImage .item {
+  position: fixed; 
+  width: 100%; height: 100%;
+  transition: opacity 2s;
+  background-size: cover;
+  filter: blur(5px);
+  opacity: 0;
+  z-index: -99;
+}
+.backgroundImage .active {
+  opacity:1;
+}
+
+a.name {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.unknown .name {
+  /*max-width: calc(100% - 101px);*/ /* 101px is the size of the Unknown label */
+  max-width: 100%;
+}
+
+.box .centered {
+  height: 206px;
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+.box.error {
+  background-color: rgba(255, 0, 0, 0.25);
+}
+
+.box.error, .box.loading {
+  display: table;
+  width: 100%;
+}
+
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}
+.rotate {
+  animation: rotation 2s infinite linear;
+}
+
+.loadingIndicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-top: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  padding-bottom: 0px;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.5s, visibility 0.5s 0.5s;
+}
+
+.loadingIndicator.active {
+  visibility: unset;
+  opacity: 1;
+}

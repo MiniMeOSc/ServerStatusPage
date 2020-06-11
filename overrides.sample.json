@@ -1,0 +1,13 @@
+[
+    {
+        "id": "valve",
+        "name": "Half Life",
+        "preferredOrder": 0
+    },
+    {
+        "id": "custom",
+        "name": "A game not supported by GameQ",
+        "address": "example.org",
+        "_resolveAddress": true
+    }
+]

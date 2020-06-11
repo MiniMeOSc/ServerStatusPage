@@ -1,0 +1,7 @@
+[
+	{
+		"id": "valve",
+		"type": "source",
+		"host": "example.com:27015"
+	}
+]

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Mike's Multiplayer Server</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="style.css" rel="stylesheet">
+
+  <script type="text/javascript" src="angular.min.js"></script>
+  <script type="text/javascript" src="app.js"></script>
+
+</head>
+
+<body ng-app="ServerInfoApp">
+
+  <!-- Container for background images. Cycles through the images by changing the opacity -->
+  <div class="backgroundImage" ng-controller="BackgroundImageCtrl">
+    <div ng-repeat="img in imgs" class="item" ng-class="{'active' : activeImg === $index}"
+      style="background-image:url({{img}});"></div>
+  </div>
+
+  <!-- Page container with maximum size for page width -->
+  <div class="container">
+
+    <!-- Page header -->
+    <div class="jumbotron box">
+      <h1>Mike's Multiplayer Server</h1>
+      <p class="lead">Welcome to Mike's multiplayer server!</p>
+      <p class="lead">This server hosts a couple of different games. Some of these have mods installed. For some games
+        you can get more detailed information if you click the link on the game's name.</p>
+    </div>
+
+    <div class="row" ng-controller="ServerListCtrl">
+      
+      <!-- No servers found message -->
+      <div class="col-lg-4 col-sm-6 col-lg-offset-4 col-sm-offset-3" ng-if="servers.length === 0 && !angular.isString(errorMessage)">
+        <div class="box loading">
+          <div class="centered">
+            <h3>No servers configured</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- 
+        Specific width box repeated for each server.
+        Sort them so that:
+          * those that have no status come last
+          * those that are online come first
+          * online servers appear in a preffered order 
+      -->
+      <div class="col-lg-4 col-sm-6"
+        ng-repeat="server in servers | orderBy:['online===undefined', '-online', 'preferredOrder']">
+
+        <!-- 
+          The actual box with semi transparent background and shadow 
+          The background color will be green if the server is online
+        -->
+        <div class="box" ng-class="{'online' : server.online}">
+
+          <!-- 
+            The server name has a maximum width to fit the Online/Offline label behind it
+            If there is no label because the status is unkown the width may be longer
+           -->
+          <div class="game" ng-class="{'unknown' : !angular.isDefined(server.online)}">
+
+            <!-- Header for the name of the server -->
+            <h3>
+
+              <!-- Output the name with a link for more information if there is one -->
+              <a ng-if="angular.isString(server.detailslink)" class="name" ng-href="{{server.detailslink}}"
+                title="{{server.name}}">{{server.name}}</a>
+              <span ng-if="!angular.isString(server.detailslink)" class="name"
+                title="{{server.name}}">{{server.name}}</span>
+
+              <!-- If we have status information output a label for that -->
+              <span class="label" ng-if="angular.isDefined(server.online)"
+                ng-class="{'label-success': server.online, 'label-danger': !server.online}">{{server.online?'Online':'Offline'}}</span>
+            </h3>
+
+            <!-- If available output the name of the map currently running on the server to the right of the player count -->
+            <p ng-if="angular.isString(server.map)" class="pull-right">Map: {{server.map}}</p>
+
+            <!-- If we have a list of players or a count output these -->
+            <p
+              ng-if="angular.isDefined(server.players) && server.online || angular.isNumber(server.num_players) || angular.isNumber(server.max_players)">
+              Players
+
+              <!-- If we have current or max player count output those (seperated by a slash if we have both) -->
+              <span class="label label-default"
+                ng-if="angular.isNumber(server.num_players) || angular.isNumber(server.max_players)">
+                <span ng-if="angular.isNumber(server.num_players)">{{server.num_players}}</span>
+                <span ng-if="angular.isNumber(server.num_players) && angular.isNumber(server.max_players)">/</span>
+                <span ng-if="angular.isNumber(server.max_players)">{{server.max_players}}</span>
+              </span>
+            </p>
+
+            <!-- If the server is online and has a list of players, output that -->
+            <ul ng-if="angular.isDefined(server.players) && server.online" class="well playerlist">
+              <li ng-repeat="player in server.players">{{player.name}}</li>
+            </ul>
+
+            <!-- If we have no status information about this server output a message about that for the user -->
+            <p ng-if="!angular.isDefined(server.online)"><i>Status information is not available for this game. The server may be
+                online or not, you can only find out by trying to connect.</i></p>
+
+          </div>
+
+          <!-- At the bottom of the box, output the address and a link to join the server if available -->
+          <div class="clearfix address">
+
+            <!-- Server address -->
+            <span ng-if="angular.isString(server.address)">
+              Address: <code>{{server.address}}</code>
+            </span>
+
+            <!-- Join link -->
+            <span class="pull-right" ng-if="angular.isString(server.joinlink)">
+              <a class="btn btn-primary" ng-href="{{server.joinlink}}" role="button">Join</a>
+            </span>
+
+          </div>
+
+        </div><!-- /box -->
+
+      </div><!-- /col -->
+
+      <!-- Box with error message -->
+      <div class="col-lg-4 col-sm-6 col-lg-offset-4 col-sm-offset-3" ng-if="angular.isString(errorMessage)">
+        <div class="box error">
+          <div class="centered">
+            <p>An error occured when querying the server list.</p>
+            <p>{{errorMessage}}</p>
+            <a class="btn btn-default" ng-click="refresh()" ng-disabled="loadingServers"><i
+                class="glyphicon glyphicon-refresh"></i> Retry</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading indicator -->
+      <!--<div class="box loadingIndicator" ng-class="{ 'active': loadingServers }">
+          <p>Loading server list... <i class="glyphicon glyphicon-refresh rotate"></i><p>
+      </div>-->
+
+    </div><!-- /row -->
+
+  </div> <!-- /container -->
+
+  <!-- Site footer -->
+  <footer class="mastfoot">
+    <p>The server is maintained by <a href="https://steamcommunity.com/id/minimeosc">Mini-Me</a>.</p>
+  </footer>
+
+</body>
+
+</html>
