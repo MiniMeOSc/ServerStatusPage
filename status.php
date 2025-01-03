@@ -60,16 +60,25 @@ foreach($overrides as $override) {
 		$gameKey = array_key_last($games);
 	}
 
-	// Check whether the option is set for this game that the hostname needs to be resolved to an ip address
-	// This is relevant if the game does offer entering an ip address to connect to, but not hostnames
-	$resolveAddress = array_key_exists('_resolveAddress', $override) ? $override['_resolveAddress'] : false;
-	
 	foreach(array_keys($override) as $key) {
 		// Skip _resolveAddress to not add it to the output for the client
 		if($key === '_resolveAddress') continue;
 		
-		// If we're overwriting the address and the property to resolve it was set, do that, otherwise take the plain value
-		$games[$gameKey][$key] = ($key === 'address' && $resolveAddress) ? gethostbyname($override[$key]) : $override[$key];				
+		$games[$gameKey][$key] = $override[$key];
+	}
+	
+	// Check whether the option is set for this game that the hostname needs to be resolved to an ip address
+	// This is relevant if the game does offer entering an ip address to connect to, but not hostnames
+	if(array_key_exists('_resolveAddress', $override) && $override['_resolveAddress']) {
+		$address = $games[$gameKey]['address'];
+
+		// gethostbyname expects only a hostname and will fail if we have a port as well. 
+		// Separate the address parts so we can properly resolve the hostname.
+		$addressParts = explode(':', $address);
+		$addressParts[0] = gethostbyname($addressParts[0]);
+		
+		// join them back together
+		$games[$gameKey]['address'] = implode(':', $addressParts);
 	}
 }
 
