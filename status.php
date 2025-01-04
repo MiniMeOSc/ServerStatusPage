@@ -19,7 +19,8 @@ require_once('GameQ/Autoloader.php');
 
 // Load the server list to query from a file and perform the queries
 $GameQ = new \GameQ\GameQ();
-$GameQ->addServersFromFiles('servers.json');
+$servers = json_decode(file_get_contents('servers.json'), true);
+$GameQ->addServers($servers);
 $results = $GameQ->process();
 
 // Now sanitize the output to fill in just the data we need to send to the client
@@ -32,6 +33,9 @@ foreach($results as $key => $value) {
 			'name' => $player['gq_name'],
 		];
 	}
+	
+	// find the key of this server in the input array
+	$serversKey = array_find_key_by_property($key, 'id', $servers);
 
 	// Sanitize data about the game instance and add it to the array
 	$games[] = [
@@ -44,7 +48,8 @@ foreach($results as $key => $value) {
 		'map' => $value['gq_mapname'],
 		// hide empty join links GameQ might return
 		'joinlink' => is_string($value['gq_joinlink']) && strlen($value['gq_joinlink']) > 0 ? $value['gq_joinlink'] : null,
-		'address' => $value['gq_address'] . ':' . $value['gq_port_client'],
+		// take the address from the original input data
+		'address' => $servers[$serversKey]['host'],
 	];
 }
 
